@@ -11,7 +11,7 @@
   },
   "then": {
     "type": "runCommand",
-    "comment": "Runs whichever suites exist; harmless no-op before test scaffolding lands.",
-    "command": "sh -c 'set -e; if [ -f addon/tests/run.lua ] && command -v lua >/dev/null 2>&1; then lua addon/tests/run.lua; fi; if [ -f companion/src-tauri/Cargo.toml ] && command -v cargo >/dev/null 2>&1; then (cd companion/src-tauri && cargo test); fi'"
+    "comment": "Runs the addon suite (luac + busted) and the companion suite when present.",
+    "command": "sh -c 'set -e; if [ -f addon/tests/run.sh ]; then sh addon/tests/run.sh; fi; if [ -f companion/src-tauri/Cargo.toml ] && command -v cargo >/dev/null 2>&1; then (cd companion/src-tauri && cargo test); fi'"
   }
 }

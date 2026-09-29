@@ -1,0 +1,9 @@
+-- busted configuration
+return {
+  default = {
+    ["ROOT"] = { "addon/tests" },
+    pattern = "_spec",
+    -- Run from the repo root so `require("addon.tests.wow_stubs")` resolves.
+    lpath = "./?.lua;./?/init.lua",
+  },
+}
