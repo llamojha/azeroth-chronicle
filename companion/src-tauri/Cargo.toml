@@ -1,0 +1,35 @@
+[package]
+name = "azeroth-chronicle"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "chronicle"
+
+# The desktop window binary. Excluded from `cargo test`/`cargo build` unless the
+# `desktop` feature is on, so the core library and its tests never pull Tauri.
+[[bin]]
+name = "azeroth-chronicle"
+path = "src/main.rs"
+required-features = ["desktop"]
+
+[features]
+default = []
+bedrock = ["dep:aws-config", "dep:aws-sdk-bedrockruntime", "dep:tokio"]
+desktop = ["dep:tauri", "dep:tauri-plugin-dialog"]
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tempfile = "3"
+aws-config = { version = "1", optional = true }
+aws-sdk-bedrockruntime = { version = "1", optional = true }
+tokio = { version = "1", features = ["rt", "time"], optional = true }
+tauri = { version = "2", optional = true , features = [] }
+tauri-plugin-dialog = { version = "2", optional = true }
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dev-dependencies]
+proptest = "1"

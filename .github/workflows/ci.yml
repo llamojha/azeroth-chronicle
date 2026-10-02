@@ -1,0 +1,96 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Cancel superseded runs on the same ref.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Core Rust library: format, lint, and the full test suite including the
+  # property tests. Uses the `bedrock` feature (pure-Rust AWS SDK, no network)
+  # but NOT `desktop`, so no GTK/WebKit system libraries are needed on Linux.
+  core:
+    name: Rust core (test + proptests + clippy)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: companion/src-tauri
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: companion/src-tauri
+      - name: Formatting
+        run: cargo fmt --all --check
+      - name: Clippy (deny warnings)
+        run: cargo clippy --all-targets --features bedrock -- -D warnings
+      - name: Tests (incl. property tests)
+        run: cargo test --features bedrock
+
+  # React/Vite frontend: type-check and production build.
+  frontend:
+    name: Frontend (tsc + vite build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: companion
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: companion/package-lock.json
+      - run: npm ci
+      - run: npm run build
+
+  # Lua addon: syntax check + busted unit/property specs (WoW APIs stubbed).
+  addon:
+    name: Addon (luac + busted)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: leafo/gh-actions-lua@v10
+        with:
+          luaVersion: "5.4"
+      - uses: leafo/gh-actions-luarocks@v5
+      - name: Install busted + luacheck
+        run: |
+          luarocks install busted
+          luarocks install luacheck
+      - name: Run addon tests
+        run: sh addon/tests/run.sh
+
+  # Prove the Tauri desktop app compiles. On macOS the WebView ships with the
+  # OS, so no extra system dependencies are required.
+  desktop:
+    name: Desktop build (macOS, Tauri)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: companion/package-lock.json
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: companion/src-tauri
+      - name: Build frontend (needed for generate_context!)
+        working-directory: companion
+        run: |
+          npm ci
+          npm run build
+      - name: Build desktop binary
+        working-directory: companion/src-tauri
+        run: cargo build --features desktop
