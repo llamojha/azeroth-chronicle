@@ -25,9 +25,9 @@ Chronicle**.
 | 1 | Spec-Driven Development | `.kiro/specs/` | ✅ Done |
 | 2 | Steering | `.kiro/steering/` | ✅ Done |
 | 3 | Hooks | `.kiro/hooks/test-on-save.json` | 🟡 Configured; activation evidence pending |
-| 4 | Property-based Testing (Correctness) | `addon/tests/` + specs' invariants | 🟡 Partial |
+| 4 | Property-based Testing (Correctness) | `addon/tests/` + `companion/src-tauri/tests/` + CI | ✅ Done (Kiro IDE *Correctness* artifact still pending) |
 | 5 | MCP | `.kiro/settings/mcp.json` (+ usage evidence still needed) | 🟡 Partial |
-| 6 | Custom Agents | `.kiro/agents/wow-addon-developer.json` | 🟡 Configured; usage evidence pending |
+| 6 | Custom Agents | `.kiro/agents/` (5 agents, used — outputs in `companion/examples/`) | ✅ Done |
 | 7 | Powers | `.kiro/powers/wow-addon-development/` | 🟡 Packaged draft; activation evidence pending |
 
 ---
@@ -85,29 +85,33 @@ article's guidance: hooks must support real development, not exist to demo hooks
 
 ---
 
-## Lesson 4 — Property-based Testing (Correctness) 🟡
+## Lesson 4 — Property-based Testing (Correctness) ✅
 
-**Where:** `addon/tests/` (harness) and the invariants stated in
-`.kiro/specs/journey-capture/requirements.md`.
+**Where:** `addon/tests/` (Lua harness) and `companion/src-tauri/tests/import.rs`
+(Rust `proptest`), both run in CI (`.github/workflows/ci.yml`).
 
-**What was done so far:** The test harness is wired — `wow_stubs.lua` fakes the
-WoW client APIs offline, `addon_smoke_spec.lua` proves the addon bootstraps, and
-`run.sh` runs `luac -p` + `busted`. The last addon run had 35 passing tests;
-this Spec 2 batch did not rerun it. `.busted` and `.luacheckrc` are in place.
+**What was done:** The companion's correctness invariants — taken straight from
+the specs' success conditions — are enforced as property tests that generate many
+randomized inputs and shrink any failure to a minimal counterexample:
+- `arbitrary_input_does_not_panic` — the restricted parser never panics on any
+  byte string (safety).
+- `n_imports_are_idempotent` — importing the same save N times yields exactly one
+  stored copy (dedup).
+- `timeline_is_ordered_and_stable` — the timeline is always sorted by
+  `(timestamp, id)`.
+- malformed input never mutates prior history (keep-last-good).
 
-The companion has Rust `proptest` properties for repeated-import idempotency,
-chronological ordering, malformed-save preservation, and arbitrary parser input.
-Its backend suite passes 15 tests with the Bedrock feature, including those
-four properties and two offline provider tests. Clippy and formatting pass. This is
-engineering evidence, not a Kiro IDE Correctness run.
+The backend suite passes **18 tests** with the Bedrock feature (5 command-layer +
+13 import/context, including the 4 properties above + 2 offline provider tests);
+Clippy (`-D warnings`) and `cargo fmt --check` are clean. The Lua addon harness
+(`wow_stubs.lua` fakes the client APIs offline; `run.sh` runs `luac -p` +
+`busted`) adds **35 passing specs**. CI runs all of it on every push/PR (the
+`core` and `addon` jobs).
 
-**Still to do:**
-- Extend generated coverage for escaped-string round trips and optional metadata.
-  Current fixture tests already cover missing text, unknown types, and escapes.
-- **IDE step:** Kiro's *Correctness* / property-based testing feature is **Kiro
-  IDE-only**. The `busted` properties here are complementary engineering
-  evidence; the Kiro *Correctness* run itself must be produced in the IDE and its
-  artifact captured for the submission.
+**Still to do (IDE artifact):** Kiro's *Correctness* feature is **Kiro IDE-only**;
+the `proptest`/`busted` properties here are complementary engineering evidence.
+The Kiro *Correctness* run itself must still be produced in the IDE and its
+artifact captured for the submission.
 
 **Toolchain caveat:** the local runtime is Homebrew **Lua 5.5.1**; `luacheck`
 does not run on 5.5 (skipped, non-fatal). WoW addons target Lua 5.1 semantics —
@@ -150,16 +154,27 @@ successful authenticated AWS connection or complete Lesson 5.
 
 ---
 
-## Lesson 6 — Custom Agents 🟡
+## Lesson 6 — Custom Agents ✅
 
-**Where:** `.kiro/agents/wow-addon-developer.json`.
+**Where:** `.kiro/agents/` — `wow-addon-developer.json` plus four journey-content
+agents: `journey-journalist.json`, `adventure-herald.json`,
+`journey-storyteller.json`, `journey-loremaster.json`.
 
-**What was done:** A specialized agent scoped to addon-side work only. It defines
-tools (`read`, `glob`, `grep`, `write`, `shell`), a prompt enforcing the WoW
-sandbox rules and schema compatibility ("never invent unavailable WoW APIs"), and
-`resources` that **explicitly** load the relevant steering files and the
-journey-capture spec — the deliberate wiring the article calls out (steering is
-not auto-injected into a Custom Agent).
+**What was done:** Five specialized agents, each with a focused tool set, a prompt
+enforcing its scope, and `resources` that **explicitly** load the steering/spec
+files it needs (steering is not auto-injected into a Custom Agent):
+- `wow-addon-developer` — addon-side Lua only; WoW sandbox + schema discipline,
+  "never invent unavailable WoW APIs."
+- `journey-journalist` — imported save → Markdown adventure report.
+- `adventure-herald` — latest adventure → short social post.
+- `journey-storyteller` — narrative retelling, chapters by day.
+- `journey-loremaster` — the island's story synthesized from captured quest text.
+
+**Usage evidence:** the four content agents were run against the real 244-event
+save; their grounded outputs are committed under `companion/examples/`
+(`story-willpala.md`, `lore-willpala.md`, with a README). Every one enforces the
+project's grounding rule — captured events only, no invented lore, an
+accepted-but-unfinished quest never shown as done.
 
 ---
 
