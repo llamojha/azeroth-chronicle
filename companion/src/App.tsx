@@ -6,6 +6,7 @@ import {
   getTimeline,
   importJourney,
   inTauri,
+  rememberFolder,
   storySoFar,
 } from "./api";
 import type { Character, ChronicleEvent, History } from "./types";
@@ -108,6 +109,13 @@ export default function App() {
     if (!selectedId && characters.length) setSelectedId(characters[0].id);
   }, [characters, selectedId]);
 
+  // A recap belongs to the character it was generated for. When the active
+  // character changes, drop the stale recap so one character's Story So Far is
+  // never shown under another character's identity.
+  useEffect(() => {
+    setRecap(null);
+  }, [active?.id]);
+
   const lastImportLine = useMemo(() => {
     if (history.lastImport) {
       return `Last import: ${fmtTime(history.lastImport)} · WoW saves on /reload or logout`;
@@ -123,6 +131,10 @@ export default function App() {
       setFolder(picked);
       const report = await discover(picked);
       const ok = report.files.length > 0;
+      // Persist the chosen folder as soon as discovery validates it, independent
+      // of a later successful import — so closing the app after discovery (or
+      // while troubleshooting an empty/malformed save) does not lose the choice.
+      await rememberFolder(picked);
       if (ok) {
         setStatus(`Found ${report.files.length} saved journey file(s). Ready to import.`);
       } else {

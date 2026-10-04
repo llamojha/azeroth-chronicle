@@ -37,10 +37,10 @@ For development, install Node.js/npm, Rust/Cargo, and the native macOS build too
 ```sh
 cd companion
 npm install
-npm run tauri -- dev --features desktop
+npm run tauri:dev
 ```
 
-The desktop feature is required by the Rust binary; the option was checked against the installed Tauri CLI. The previously built app is under companion/src-tauri/target/release/bundle/macos/. It is a local artifact, not a published, signed, or notarized release.
+The `tauri:dev` / `tauri:build` scripts enable the `desktop` feature the Rust binary requires, so standard launches need no manual `--features` flag. The previously built app is under companion/src-tauri/target/release/bundle/macos/. It is a local artifact, not a published, signed, or notarized release.
 
 ## Architecture and safety
 
