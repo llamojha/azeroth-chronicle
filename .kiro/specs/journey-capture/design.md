@@ -58,28 +58,45 @@ level?       number   -- session_started
 ```
 id = guid .. ":" .. type .. ":" .. (questId or zone or "?") .. ":" .. timestamp
 ```
-Stable given the same inputs, which is what makes companion import idempotent.
+This is the base ID. For all supported events, MakeEvent copies the
+captured fields and adds :2, :3, ... when the base already exists in the character
+history. This preserves distinct same-second occurrences, including after reload.
+The stored ID never changes, which makes companion import idempotent. Legacy
+IDs remain unchanged. Quest occurrence guards run before allocating an ID.
 
 ### Location change (meaningful only)
-Keep `lastZone`/`lastSubzone` in memory. On a zone event, read current
+Restore `lastZone`/`lastSubzone` from the latest stored location event on login,
+then keep them in memory. On a zone event, read current
 zone/subzone; emit `location_changed` only if the pair differs from the last
 emitted pair. This satisfies R4.1/R4.2 without coordinate polling.
 
 ### Quest snapshot resolution
-```
-pending = {}                         -- questId -> true
-QUEST_ACCEPTED(questId):
-    snap = tryResolve(questId)
-    if snap.complete: store quest_accepted event
-    else: pending[questId] = true
-QUEST_LOG_UPDATE:
-    for questId in pending:
-        snap = tryResolve(questId)
-        if snap.complete or firstAttemptStale:
-            store quest_accepted event; pending[questId] = nil
-```
-`tryResolve` reads title/description/objectives with guarded API calls; any
-field may be nil (R3.4).
+QUEST_DETAIL caches one quest offer by GetQuestID using GetTitleText,
+GetQuestText, and GetObjectiveText. Viewing a dialog creates no event.
+Acceptance copies and consumes a matching offer; the log reader fills gaps.
+
+Acceptance saves questId, timestamp, zone, subzone, and mapId before trying
+metadata resolution. A pending snapshot is not yet part of immutable history.
+Resolution merges optional text into that snapshot, not into a stored event.
+
+If immediate resolution fails, the next QUEST_LOG_UPDATE retries once and
+stores the snapshot even if text is missing. PLAYER_LOGOUT flushes all pending
+snapshots; turn-in flushes that quest before recording completion. This bounded
+fallback preserves the occurrence but can miss text that arrives after the retry.
+
+Repeated acceptance notifications are suppressed within one addon load until
+removal or turn-in. QUEST_REMOVED flushes acceptance and allows reacceptance;
+it never records completion. Completed quest IDs suppress repeated turn-ins
+until a new acceptance, allowing separate same-second repeatable cycles.
+These guards are runtime-only; cross-reload notification replay is unverified.
+
+The Classic reader resolves a current index by quest ID and checks return 8
+of GetQuestLogTitle before reading text. It saves the selected index, selects
+the matched entry, reads GetQuestLogQuestText, then restores selection even on
+read failure. Nested QUEST_LOG_UPDATE handling is paused during this operation.
+C_QuestLog.GetQuestInfo is a guarded title fallback. Only nonempty strings are
+stored as text. Published Classic source supports these contracts; the actual
+Forever client passed the live acceptance gate on build 70170 (see task list).
 
 ## Failure modes & mitigations
 

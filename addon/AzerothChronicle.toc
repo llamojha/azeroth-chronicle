@@ -1,4 +1,4 @@
-## Interface: 11507
+## Interface: 16001
 ## Title: Azeroth Chronicle
 ## Notes: Personal memory for your character — records your journey as structured events.
 ## Author: Alvaro

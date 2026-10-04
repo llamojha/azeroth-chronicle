@@ -60,13 +60,17 @@ parse. Success imports; failure logs and keeps last good state (R7.2).
 ```rust
 pub struct JourneyContext { character: Character, events: Vec<ChronicleEvent> }
 
-#[async_trait]
 pub trait StoryGenerator {
-    async fn generate_story_so_far(&self, ctx: &JourneyContext) -> Result<String>;
+    fn generate_story_so_far(&self, ctx: &JourneyContext) -> Result<String, String>;
 }
 ```
 
-- Default impl: `BedrockNovaGenerator` — calls Amazon Bedrock (Nova) via the AWS
+The current trait is synchronous. Tauri commands must call providers on a
+blocking worker, never the UI thread or inside an existing async runtime.
+The offline implementation is the default until the user explicitly consents
+to sending journey data to AWS and incurring model charges.
+
+- Cloud impl: `BedrockNovaGenerator` — calls Amazon Bedrock (Nova) via the AWS
   SDK, with a prompt that: (a) lists character + ordered events + quest text,
   (b) instructs the model to summarize ONLY what happened, name people/threads
   that appear in the events, and NOT invent progression (R8.3).

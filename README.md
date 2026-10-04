@@ -67,8 +67,12 @@ companion/                 macOS companion (Tauri: Rust backend + web frontend)
 
 See `.kiro/specs/*/tasks.md` for the task lists.
 
-> ⚠️ `addon/AzerothChronicle.toc` `## Interface:` is a placeholder — confirm the
-> exact WoW: Forever build number before loading in-game.
+> Interface 16001 is confirmed by the user's in-game GetBuildInfo output:
+> WoW: Forever 1.60.1, build 70170 (2026-10-02). Live capture is verified:
+> 71 saved events, zero duplicate IDs, and quest 92516 with captured text and completion.
+>
+> Spec 2 is in progress. The Rust import core runs; the desktop app is not yet
+> available. See `companion/README.md` for current checks and mockups.
 
 ## Out of scope for the MVP
 
