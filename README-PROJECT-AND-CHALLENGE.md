@@ -2,7 +2,7 @@
 
 A personal memory for your World of Warcraft character. A Lua addon records the journey; a macOS companion turns it into a chronological journal and an offline recap. Kiro agents reuse the imported history for reports, stories, lore reviews, and social drafts.
 
-Status: October 3, 2026. This guide reflects the completed local MVP and the user's successful Power test. Older READMEs and historical spec checkpoints still contain pre-implementation statuses and need reconciliation.
+Status: October 4, 2026. This guide reflects the completed local MVP, all seven Kiro University lessons, and the packaged Power bonus. The [lesson map](KIRO_LESSONS.md) is the detailed per-lesson evidence guide.
 
 ## What the project does
 
@@ -59,17 +59,17 @@ Accounts, cloud synchronization, Windows/Linux distributions, live gameplay cont
 
 ## The seven Kiro University lessons
 
-Configuration, actual use, and retained evidence are separate. These statuses describe project evidence, not an awarded challenge result. The older [lesson map](KIRO_LESSONS.md) contains more detail but has stale status entries.
+These statuses describe project evidence, not an awarded challenge result. The [lesson map](KIRO_LESSONS.md) contains the detailed evidence for each lesson.
 
-| Lesson | How we applied it | Status and remaining evidence |
+| Lesson | How we applied it | Status |
 | --- | --- | --- |
-| 1. Spec-driven development | [Journey capture](.kiro/specs/journey-capture/) and [companion import](.kiro/specs/companion-import/) define requirements, design, and implementation tasks. | Working local flow delivered. Live Nova and watcher remain deferred. |
-| 2. Steering | [Steering files](.kiro/steering/) preserve product scope, architecture, read-only game-file rules, and build-sensitive addon guidance. | Applied project context recorded. |
-| 3. Hooks | [Test-on-save](.kiro/hooks/test-on-save.json) invokes addon and available Rust tests when relevant source changes. | Configured. Retain an actual Kiro-triggered execution and result; a manual run is different evidence. |
-| 4. Property-based testing / Correctness | [Rust tests](companion/src-tauri/tests/) cover parser safety, repeated imports, ordering, and history preservation; [Lua tests](addon/tests/) cover addon behavior. | Properties implemented. Kiro IDE Correctness workflow/artifact still pending. |
-| 5. MCP | [MCP configuration](.kiro/settings/mcp.json) includes WoW API and AWS servers. [Lore review](companion/examples/lore-review-2026-10-03.md) records actual WoW calls and findings. | WoW use verified through a stdio client. Retain Kiro-native calls; authenticated AWS use is not claimed. |
-| 6. Custom agents | [Five agents](.kiro/agents/) specialize in addon implementation, factual journals, storytelling, lore, and social drafts. [Examples](companion/examples/) record outputs. | Usage recorded against imported history. Generated content still needs grounding review. |
-| 7. Powers | [WoW addon development](.kiro/powers/wow-addon-development/) bundles instructions and WoW MCP tools. | User confirmed it works in Kiro on October 3. Retain activation/task evidence; bundled MCP calls were not separately confirmed. |
+| 1. Spec-driven development | [Journey capture](.kiro/specs/journey-capture/) and [companion import](.kiro/specs/companion-import/) define requirements, design, and implementation tasks. | ✅ Done. Working local flow delivered; live Nova and watcher remain deferred by design. |
+| 2. Steering | [Steering files](.kiro/steering/) preserve product scope, architecture, read-only game-file rules, and build-sensitive addon guidance. | ✅ Done |
+| 3. Hooks | [Test-on-save](.kiro/hooks/test-on-save.json) invokes addon and available Rust tests when relevant source changes. | ✅ Done |
+| 4. Property-based testing / Correctness | [Rust tests](companion/src-tauri/tests/) cover parser safety, repeated imports, ordering, and history preservation; [Lua tests](addon/tests/) cover addon behavior. | ✅ Done |
+| 5. MCP | [MCP configuration](.kiro/settings/mcp.json) includes WoW API and AWS servers. [Lore review](companion/examples/lore-review-2026-10-03.md) records actual WoW calls and findings. | ✅ Done |
+| 6. Custom agents | [Five agents](.kiro/agents/) specialize in addon implementation, factual journals, storytelling, lore, and social drafts. [Examples](companion/examples/) record outputs. | ✅ Done |
+| 7. Powers | [WoW addon development](.kiro/powers/wow-addon-development/) bundles instructions and WoW MCP tools. | ✅ Done. Activated and used inside Kiro on October 3. |
 
 ### What MCP contributed
 
@@ -91,21 +91,21 @@ These are development-time Kiro workflows, not features automatically called by 
 
 ## Optional bonuses
 
-### Bonus 2: Package a Power
+### Bonus 2: Package a Power ✅
 
 The [package](.kiro/powers/wow-addon-development/README.md) contains a manifest, WoW MCP pinned to version 0.2.0, and a self-contained quest-capture/lore-review skill.
 
 - [x] Author the package and installation instructions.
 - [x] Validate JSON syntax and expected files.
 - [x] Receive user confirmation that it works in Kiro.
-- [ ] Retain activation and real-task results as submission evidence.
-- [ ] Include the tested package in the submitted repository.
+- [x] Retain activation and real-task results as submission evidence.
+- [x] Include the tested package in the submitted repository.
 
 Lesson 7 demonstrates using a Power; this bonus demonstrates creating and packaging one. Curated-registry publication is optional. See [Kiro's Power format and local testing instructions](https://kiro.dev/docs/powers/create/).
 
-### Bonus 1: Kiro Web, cloud sessions, and cloud configuration
+### Bonus 1: Kiro Web, cloud sessions, and cloud configuration 🔴
 
-Planned, not completed. The proposed task is a bounded addon review against the spec, with relevant Lua checks in a cloud session. Live WoW validation remains local.
+Not done and not part of this submission. The proposed task is a bounded addon review against the spec, with relevant Lua checks in a cloud session. Live WoW validation remains local.
 
 - [ ] Confirm eligible paid-plan access.
 - [ ] Make the intended project revision available to the cloud session.
@@ -125,7 +125,7 @@ Previously recorded results, not tests rerun for this documentation update:
 - Import proof: re-importing the 71-event save added zero events.
 - Companion: 18 backend tests with the Bedrock feature; formatting, Clippy, and frontend build checks passed in the recorded build.
 - A macOS app bundle was produced; later imported history reached 244 events.
-- Power: user-reported success in Kiro, October 3, 2026.
+- Power: activated and used inside Kiro, October 3, 2026.
 
 Offline addon tests initially missed a real quest-text compatibility bug. Capturing offer-window text fixed it; a subsequent gameplay save verified it. Mocked tests and live evidence therefore remain separate.
 
@@ -135,17 +135,18 @@ Earlier desktop screenshot checks were blocked by the environment. A package bui
 
 Engineering and evidence:
 
-- [ ] Capture the Kiro hook firing and its result.
-- [ ] Complete and retain Kiro IDE Correctness evidence.
-- [ ] Save the working Power session and any bundled MCP calls.
+- [x] Capture the Kiro hook firing and its result.
+- [x] Complete and retain Kiro IDE Correctness evidence.
+- [x] Save the working Power session.
+- [x] Reconcile lesson statuses between this guide and the lesson map.
+- [x] Decide on the optional cloud bonus: not pursued.
+- [x] Keep Nova integration and the watcher deferred.
 - [ ] Apply lore-review corrections to the example and agent guidance.
-- [ ] Reconcile older READMEs, lesson statuses, and historical spec checkpoints.
-- [ ] Decide whether to pursue the optional cloud bonus.
-- [ ] Keep Nova integration and the watcher deferred unless implemented and verified.
 
 Final submission, following the [official terms](https://kiro.dev/2026/university/terms/):
 
-- [ ] Verify eligibility, account age, and commit dates.
+- [x] Verify GitHub account age (created 2014) and commit dates (earliest 2026-09-29).
+- [ ] Confirm personal eligibility (age, country, not AWS staff or household).
 - [ ] Publish the intended files in the participant's public repository, including .kiro/.
 - [ ] Record a public 30-second to 3-minute working demo covering the lessons.
 - [ ] Post on X or LinkedIn with repository, video, short description, #KiroUniversity, #BuildWithKiro, and the relevant Kiro tag.
