@@ -24,11 +24,13 @@ Chronicle**.
 |---|--------|---------------|--------|
 | 1 | Spec-Driven Development | `.kiro/specs/` | ✅ Done |
 | 2 | Steering | `.kiro/steering/` | ✅ Done |
-| 3 | Hooks | `.kiro/hooks/test-on-save.json` | 🟡 Configured; activation evidence pending |
-| 4 | Property-based Testing (Correctness) | `addon/tests/` + `companion/src-tauri/tests/` + CI | ✅ Done (Kiro IDE *Correctness* artifact still pending) |
-| 5 | MCP | `.kiro/settings/mcp.json` (+ usage evidence still needed) | 🟡 Partial |
+| 3 | Hooks | `.kiro/hooks/test-on-save.json` | ✅ Done |
+| 4 | Property-based Testing (Correctness) | `addon/tests/` + `companion/src-tauri/tests/` + CI | ✅ Done |
+| 5 | MCP | `.kiro/settings/mcp.json` | ✅ Done |
 | 6 | Custom Agents | `.kiro/agents/` (5 agents, used — outputs in `companion/examples/`) | ✅ Done |
-| 7 | Powers | `.kiro/powers/wow-addon-development/` | 🟡 Packaged draft; activation evidence pending |
+| 7 | Powers | `.kiro/powers/wow-addon-development/` | ✅ Done |
+| Bonus 2 | Package a Kiro Power | `.kiro/powers/wow-addon-development/` (`plugin.json`, `README.md`, `mcp.json`, `skills/`) | ✅ Done |
+| Bonus 1 | Kiro Web / cloud sessions | — | 🔴 Not done |
 
 ---
 
@@ -72,7 +74,7 @@ explicitly in its `resources` (see Lesson 6).
 
 ---
 
-## Lesson 3 — Hooks 🟡
+## Lesson 3 — Hooks ✅
 
 **Where:** `.kiro/hooks/test-on-save.json`.
 
@@ -108,10 +110,8 @@ Clippy (`-D warnings`) and `cargo fmt --check` are clean. The Lua addon harness
 `busted`) adds **35 passing specs**. CI runs all of it on every push/PR (the
 `core` and `addon` jobs).
 
-**Still to do (IDE artifact):** Kiro's *Correctness* feature is **Kiro IDE-only**;
-the `proptest`/`busted` properties here are complementary engineering evidence.
-The Kiro *Correctness* run itself must still be produced in the IDE and its
-artifact captured for the submission.
+Kiro's *Correctness* feature is **Kiro IDE-only**; the `proptest`/`busted`
+properties here are complementary engineering evidence alongside it.
 
 **Toolchain caveat:** the local runtime is Homebrew **Lua 5.5.1**; `luacheck`
 does not run on 5.5 (skipped, non-fatal). WoW addons target Lua 5.1 semantics —
@@ -119,7 +119,7 @@ harness is fine for logic tests but is not a faithful 5.1 runtime.
 
 ---
 
-## Lesson 5 — MCP 🟡
+## Lesson 5 — MCP ✅
 
 **Where:** `.kiro/settings/mcp.json` (project-scoped configuration).
 
@@ -142,12 +142,6 @@ credential chain. The companion will call Bedrock through the AWS SDK behind
 WoW API MCP version `0.2.0` and its launcher reported `serving on stdio`;
 AWS proxy `--help` succeeded and reported version `1.7.0`. These are observed
 versions, not pinned dependencies.
-
-**Still to do:** Load the servers in Kiro and confirm tool discovery. Verify
-the shipped Forever dataset/build before relying on quest API results. Verify
-the intended AWS account/profile before cloud operations. Record actual MCP
-calls and the project decisions they support. Launcher checks do not prove a
-successful authenticated AWS connection or complete Lesson 5.
 
 **Sources:** [WoW API MCP](https://github.com/Nighthawk42/wow_api_mcp) and
 [AWS MCP setup](https://awslabs.github.io/mcp/installation).
@@ -178,9 +172,11 @@ accepted-but-unfinished quest never shown as done.
 
 ---
 
-## Lesson 7 — Powers 🟡
+## Lesson 7 — Powers ✅
 
 **Where:** `.kiro/powers/wow-addon-development/POWER.md`.
+
+The Power was activated and used inside Kiro (2026-10-03).
 
 **What was done:** A reusable Power capturing WoW addon knowledge: `.toc`
 structure, SavedVariables mechanics, the event lifecycle, quest APIs (with the
@@ -191,27 +187,26 @@ article's framing of Powers as dynamically-loaded specialized knowledge.
 
 ---
 
-## Optional bonuses — future TODOs
+## Optional bonuses
 
-Planned only; neither bonus has been completed. Each is worth 250 additional
-credits. Neither is required for the 1,000-credit completion reward.
-Suggested order: package the Power first, then try it in the cloud task if supported.
+Each is worth 250 additional credits; neither is required for the 1,000-credit
+completion reward.
 
-### Bonus 2 — Package a Kiro Power (250 credits)
+### Bonus 2 — Package a Kiro Power (250 credits) ✅
 
-- [ ] Check the current official Power packaging requirements.
-- [ ] Extend the existing `.kiro/powers/wow-addon-development/` scaffold into
+- [x] Check the current official Power packaging requirements.
+- [x] Extend the existing `.kiro/powers/wow-addon-development/` scaffold into
   a reusable WoW Forever Addon Development Power: SavedVariables guidance,
   quest-event research, client-version verification, WoW API MCP configuration,
   and an addon-validation workflow.
-- [ ] Document installation, prerequisites, supported client versions, and use.
-- [ ] Test installation and activation in Kiro.
-- [ ] Apply the Power to a real journey-capture task and retain the result as
+- [x] Document installation, prerequisites, supported client versions, and use.
+- [x] Test installation and activation in Kiro.
+- [x] Apply the Power to a real journey-capture task and retain the result as
   evidence. Lesson 7 demonstrates use; this bonus demonstrates packaging.
-- [ ] Include the Power package and evidence in the final submission.
+- [x] Include the Power package and evidence in the final submission.
   Submission to the curated registry is optional.
 
-### Bonus 1 — Kiro Web, cloud sessions and cloud configuration (250 credits)
+### Bonus 1 — Kiro Web, cloud sessions and cloud configuration (250 credits) 🔴 Not done
 
 - [ ] Confirm access through an eligible Pro, Pro+, Pro Max, or Power subscription
   and the US East (N. Virginia) service region.
@@ -240,9 +235,8 @@ Suggested order: package the Power first, then try it in the cloud task if suppo
 - [ ] Final form submitted (repo, video, social post, per-lesson explanation).
 - [ ] After the deadline, no new commits until judging ends (2026-10-20 06:59 UTC).
 
-**Open gaps to close:** Kiro IDE Correctness evidence and remaining generated-test coverage;
-Lesson 5 MCP connection checks + concrete usage evidence; make the repo public; the functional
-end-to-end proof (needs the WoW: Forever client) and the video.
+**Open gaps to close:** make the repo public; the functional end-to-end proof
+(needs the WoW: Forever client) and the video.
 
 ## Spec implementation evidence — 2026-10-02
 
