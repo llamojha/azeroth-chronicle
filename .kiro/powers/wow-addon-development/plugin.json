@@ -1,0 +1,8 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "wow-addon-development",
+  "version": "0.1.0",
+  "description": "Research WoW Forever addon APIs and validate quest capture and SavedVariables without modifying player history.",
+  "author": { "name": "Alvaro" },
+  "keywords": ["WoW", "Forever", "addon", "SavedVariables", "quest capture"]
+}

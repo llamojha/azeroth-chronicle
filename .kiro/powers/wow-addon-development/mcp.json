@@ -1,0 +1,11 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
+  "mcpServers": {
+    "wow-api": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@nighthawk42/wow-api-mcp@0.2.0"],
+      "env": { "WOW_API_MCP_FLAVOR": "forever" }
+    }
+  }
+}
