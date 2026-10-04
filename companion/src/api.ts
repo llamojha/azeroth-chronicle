@@ -25,6 +25,11 @@ export const getTimeline = () => invoke<History>("timeline");
 export const storySoFar = (characterId: string) =>
   invoke<string>("story_so_far", { characterId });
 
+/** Persist the validated folder immediately, independent of a successful import.
+ *  A no-op in browser preview, where the backend commands are unavailable. */
+export const rememberFolder = (path: string): Promise<void> =>
+  inTauri() ? invoke<void>("remember_folder", { path }) : Promise.resolve();
+
 // Illustrative offline data for browser preview only — never shown inside Tauri.
 export const FIXTURE: History = {
   selectedDirectory: null,

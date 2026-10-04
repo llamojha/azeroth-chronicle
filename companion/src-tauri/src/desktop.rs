@@ -29,6 +29,14 @@ fn import_journey(path: String, state: State<'_, Shared>) -> Result<BatchResult,
 }
 
 #[tauri::command]
+fn remember_folder(path: String, state: State<'_, Shared>) -> Result<(), String> {
+    state
+        .lock()
+        .map_err(|e| e.to_string())?
+        .remember_directory(Path::new(&path))
+}
+
+#[tauri::command]
 fn timeline(state: State<'_, Shared>) -> Result<History, String> {
     Ok(state.lock().map_err(|e| e.to_string())?.timeline().clone())
 }
@@ -56,6 +64,7 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             discover,
             import_journey,
+            remember_folder,
             timeline,
             story_so_far
         ])

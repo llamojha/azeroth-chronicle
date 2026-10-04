@@ -42,6 +42,15 @@ impl AppState {
         importer::import_directory(&mut self.history, selected, &self.cache)
     }
 
+    /// Persist the chosen WoW directory as soon as it is selected, independent of a
+    /// successful import. Discovery (R1.2/R1.3) is still the validation gate; this
+    /// records the already-chosen folder so closing the app after discovery — or
+    /// while troubleshooting an empty/malformed save — does not lose the selection.
+    pub fn remember_directory(&mut self, selected: &Path) -> Result<(), String> {
+        self.history.selected_directory = Some(selected.to_path_buf());
+        self.history.save(&self.cache)
+    }
+
     /// R6: the persisted history backing the timeline view and last-sync status.
     pub fn timeline(&self) -> &History {
         &self.history
@@ -129,6 +138,28 @@ mod tests {
             .unwrap();
         assert!(recap.contains("Thrall"));
         assert!(recap.contains("Hippogryph Harassment"));
+    }
+
+    #[test]
+    fn selected_folder_persists_without_a_successful_import() {
+        let tmp = tempfile::tempdir().unwrap();
+        let (wow, cache) = fixture(tmp.path(), SAVE);
+
+        // Choose the folder and persist it, but never import.
+        {
+            let mut state = AppState::load(cache.clone()).unwrap();
+            state.remember_directory(&wow).unwrap();
+            assert!(state.timeline().characters.is_empty());
+            assert_eq!(state.timeline().last_import, None);
+        }
+
+        // Reopen the app: the selection survived, independent of any import.
+        let reloaded = AppState::load(cache).unwrap();
+        assert_eq!(
+            reloaded.timeline().selected_directory.as_deref(),
+            Some(wow.as_path())
+        );
+        assert!(reloaded.timeline().characters.is_empty());
     }
 
     #[test]
