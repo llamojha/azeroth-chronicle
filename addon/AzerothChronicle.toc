@@ -2,7 +2,8 @@
 ## Title: Azeroth Chronicle
 ## Notes: Personal memory for your character — records your journey as structured events.
 ## Author: Alvaro
-## Version: 0.1.0
+## Version: 0.2.0
 ## SavedVariables: AzerothChronicleDB
 
 AzerothChronicle.lua
+ChronicleUI.lua

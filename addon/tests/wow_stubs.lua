@@ -66,10 +66,63 @@ function M.install()
 end
 
 -- Load the addon file fresh (re-runs its top-level chunk against current stubs).
--- The addon expects the addon name as its vararg (`local ADDON_NAME = ...`).
-function M.loadAddon(path)
+-- The client passes (addonName, addonNamespace) as the file's varargs.
+function M.loadAddon(path, ns)
   local chunk = assert(loadfile(path))
-  return chunk("AzerothChronicle")
+  return chunk("AzerothChronicle", ns or {})
+end
+
+-- ---------------------------------------------------------------------------
+-- Frame widgets for the journal UI. Records only what tests inspect (shown
+-- state, text, scripts). Methods are an explicit list so a probe like
+-- `frame.CloseButton` stays nil, as it would on a real untemplated frame.
+-- ---------------------------------------------------------------------------
+local NOOP_METHODS = {
+  "SetSize", "SetPoint", "SetAllPoints", "SetFrameStrata", "SetClampedToScreen",
+  "SetMovable", "EnableMouse", "EnableMouseWheel", "RegisterForDrag",
+  "StartMoving", "StopMovingOrSizing", "SetWidth", "SetJustifyH", "SetJustifyV",
+  "SetScrollChild", "UpdateScrollChildRect", "SetVerticalScroll",
+  "SetColorTexture", "SetTexture", "SetHighlightTexture", "SetNormalFontObject",
+  "LockHighlight", "UnlockHighlight", "Enable", "Disable",
+}
+
+local function Widget(kind, name, template)
+  local w = { _kind = kind, _name = name, _template = template, _shown = true,
+              _scripts = {}, _height = 1 }
+  for _, m in ipairs(NOOP_METHODS) do w[m] = function() end end
+  function w:Show() self._shown = true end
+  function w:Hide() self._shown = false end
+  function w:IsShown() return self._shown end
+  function w:SetText(t) self._text = t end
+  function w:GetText() return self._text end
+  function w:SetHeight(h) self._height = h end
+  function w:GetStringHeight() return 12 end
+  function w:GetVerticalScroll() return 0 end
+  function w:GetVerticalScrollRange() return 0 end
+  function w:SetScript(kind_, fn) self._scripts[kind_] = fn end
+  function w:GetScript(kind_) return self._scripts[kind_] end
+  function w:Click() local fn = self._scripts.OnClick; if fn then fn(self) end end
+  function w:CreateFontString() return Widget("FontString") end
+  function w:CreateTexture() return Widget("Texture") end
+  return w
+end
+
+-- Installs CreateFrame + UI globals for the journal. `opts.noTemplates`
+-- makes every templated CreateFrame fail, exercising the plain fallbacks.
+function M.installUI(opts)
+  opts = opts or {}
+  M.ui = { created = {}, byName = {} }
+  _G.CreateFrame = function(kind, name, _parent, template)
+    if template and opts.noTemplates then error("unknown template " .. template) end
+    local w = Widget(kind, name, template)
+    M.ui.created[#M.ui.created + 1] = w
+    if name then M.ui.byName[name] = w end
+    return w
+  end
+  _G.UIParent = Widget("Frame", "UIParent")
+  _G.UISpecialFrames = {}
+  _G.SlashCmdList = {}
+  _G.GameFontNormal = {}
 end
 
 return M

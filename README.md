@@ -28,7 +28,8 @@ Play WoW → accept/complete quests, change zones
 ```
 addon/                     WoW: Forever addon (Lua) — OBSERVE / NORMALIZE / STORE
   AzerothChronicle.toc
-  AzerothChronicle.lua
+  AzerothChronicle.lua     capture (the only writer of AzerothChronicleDB)
+  ChronicleUI.lua          read-only in-game journal (/chronicle)
 companion/                 macOS companion (Tauri: Rust backend + web frontend)
   src/                     React + Vite frontend  (scaffolded in Spec 2)
   src-tauri/               Rust backend            (scaffolded in Spec 2)
@@ -38,7 +39,7 @@ companion/                 macOS companion (Tauri: Rust backend + web frontend)
     companion-import/      Spec 2 — companion side (requirements/design/tasks)
   steering/                product.md, architecture.md, wow-addon-development.md
   agents/                  wow-addon-developer.json
-  hooks/                   test-on-save.json
+  hooks/                   test-on-save.json (v2 PostFileSave hook)
   powers/                  wow-addon-development/ (reusable addon knowledge)
 ```
 
@@ -55,6 +56,32 @@ companion/                 macOS companion (Tauri: Rust backend + web frontend)
 - **Story So Far** is the only AI feature, abstracted behind a `StoryGenerator`
   interface (default provider: Amazon Bedrock Nova). The recap is grounded in
   captured events and never invents progression.
+- **The in-game journal is a read-only viewer.** `ChronicleUI.lua` reads
+  `AzerothChronicleDB` and never writes it; it groups and counts captured
+  facts but adds no interpretation and no AI.
+
+## In-game journal
+
+Type `/chronicle` in game to open or close your character's journal (Escape
+also closes it). Tabs:
+
+- **Overview** — character, play sessions, quests completed/in progress, zones
+  and areas explored, recent moments.
+- **Places** — zones in the order you reached them, the areas inside them, and
+  the quests you took on there.
+- **Quests** — in progress and completed, with the captured objectives and
+  description.
+- **Timeline** — every captured moment, newest first.
+
+The window re-reads the history each time it opens. Story So Far is not shown
+in game: the companion never writes WoW files.
+
+TODO (agreed, not yet built):
+
+- [ ] Friends tab — needs new capture (e.g. group members) and a `schemaVersion`
+      bump; "social" is out of scope for the MVP until this is approved.
+- [ ] Live in-client check of `/chronicle` on WoW: Forever 1.60.1 (templates,
+      scrolling, Escape-to-close).
 
 ## Development order (hard-scoped, 1–2 days)
 
