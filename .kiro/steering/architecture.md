@@ -34,6 +34,10 @@ Journey timeline + Story So Far recap
 
 - The addon stays dumb: OBSERVE, NORMALIZE, STORE. No AI, no APIs, no summaries,
   no analysis.
+- The one exception is the read-only in-game journal (`addon/ChronicleUI.lua`,
+  `/chronicle`). It may read `AzerothChronicleDB` and group, count and sort
+  captured events for display. It must never write the SavedVariable, never
+  add interpretation or AI, and never show anything not captured.
 - The parser must **never** execute the SavedVariables file with a Lua runtime.
   Parse the restricted `AzerothChronicleDB = { ... }` syntax as data.
 - A malformed or partially-written file must never destroy previously imported

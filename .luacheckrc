@@ -11,9 +11,12 @@ read_globals = {
   "CreateFrame", "time", "select",
   "UnitGUID", "UnitName", "GetRealmName", "UnitRace", "UnitClass", "UnitLevel",
   "GetZoneText", "GetSubZoneText", "C_Map", "C_Timer",
+  -- In-game journal (ChronicleUI.lua)
+  "date", "UIParent", "UISpecialFrames", "SlashCmdList", "GameFontNormal",
 }
 
--- The account-level SavedVariable is a global the client owns.
-globals = { "AzerothChronicleDB" }
+-- The account-level SavedVariable is a global the client owns; the slash
+-- command name is a global the client reads.
+globals = { "AzerothChronicleDB", "SLASH_AZEROTHCHRONICLE1" }
 
 exclude_files = { "companion/**" }

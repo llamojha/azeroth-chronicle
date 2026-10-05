@@ -11,7 +11,7 @@ cd "$(dirname "$0")/../.." # repo root
 # 1. Syntax-check the addon (fast, catches parse errors).
 if command -v luac >/dev/null 2>&1; then
   echo "==> luac syntax check"
-  luac -p addon/AzerothChronicle.lua
+  luac -p addon/AzerothChronicle.lua addon/ChronicleUI.lua
   echo "    OK"
 fi
 
